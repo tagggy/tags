@@ -4,14 +4,8 @@ import json
 from operator import itemgetter
 import locale
 
-"""
-https://lehrerfortbildung-bw.de/u_sprachlit/deutsch/gym/bp2016/fb13/index.html
-gedicht // interpretation
-"""
-
 filename = 'input.json'
 ranks = ["LF", "BF", "10"]
-# url_prefix = "../../u_sprachlit/deutsch/gym/bp2016/fb13/2_alle/"
 url_prefix = "../../2_alle/"
 
 
@@ -25,7 +19,6 @@ def print_book_author(book):
     return output
 
 
-# TODO: maybe not needed at all, could probably just use print_book_year as well for tag view
 def print_book_tag(book):
     output = f"<li><a href=\"{url_prefix}{book['url']}\" class=\"intern\">{book['year']} {book['first_name']} {book['last_name']} \"{book['title']}\"</a></li>\n"
     return output
@@ -58,35 +51,27 @@ all_10_tags = sorted(list(set(all_10_tags)))
 all_BF_tags = sorted(list(set(all_BF_tags)))
 all_LF_tags = sorted(list(set(all_LF_tags)))
 
+# debugging output
 print(f"all_10_tags: {len(all_10_tags)}\n{all_10_tags}")
 print(f"all_BF_tags: {len(all_BF_tags)}\n{all_BF_tags}")
 print(f"all_LF_tags: {len(all_LF_tags)}\n{all_LF_tags}")
 
 print("sorted:")
-# sort (Post-)-Kolonialismus at P and Österreich at O
+# sort (Post-)Kolonialismus at P and Österreich at O via strxfrm
 locale.setlocale(locale.LC_ALL, 'de_DE')
 all_10_tags.sort(key=locale.strxfrm)
 all_BF_tags.sort(key=locale.strxfrm)
 all_LF_tags.sort(key=locale.strxfrm)
+# debugging output
 print(f"all_10_tags: {len(all_10_tags)}\n{all_10_tags}")
 print(f"all_BF_tags: {len(all_BF_tags)}\n{all_BF_tags}")
 print(f"all_LF_tags: {len(all_LF_tags)}\n{all_LF_tags}")
-
-"""
-print(f"all_10_tags: {len(all_10_tags)}")
-print(all_10_tags)
-print(f"all_BF_tags: {len(all_BF_tags)}")
-print(all_BF_tags)
-print(f"all_LF_tags: {len(all_LF_tags)}")
-print(all_LF_tags)
-"""
-
 
 # sort list of books by year
 # https://stackoverflow.com/questions/72899/how-to-sort-a-list-of-dictionaries-by-a-value-of-the-dictionary-in-python
 data = sorted(data, key=itemgetter('year'))
 for book in data:
-    # 10, BF, LF
+    # ranks are 10, BF, LF
     for rank in ranks:
         if rank in book['level'] and book['url']:
             with open(f"{rank}_nach_jahren.html", 'a') as file_object:
@@ -95,17 +80,15 @@ for book in data:
 # sort list of books by author
 data = sorted(data, key=itemgetter('last_name'))
 for book in data:
-    # 10, BF, LF
+    # ranks are 10, BF, LF
     for rank in ranks:
         if rank in book['level'] and book['url']:
             with open(f"{rank}_nach_autoren.html", 'a') as file_object:
                 file_object.write(print_book_author(book))
 
+# TODO: code duplication starting here
 # sort list of books by tag
 data = sorted(data, key=itemgetter('year'))
-
-# TODO: code duplication starting here
-
 # level 10: overview of all tags
 output = "10_nach_schlagwoertern.html"
 with open(output, 'a') as file_object:
@@ -117,6 +100,7 @@ with open(output, 'a') as file_object:
     file_object.write("</ul>\n")
 
 # level 10: books for each tag
+# not efficient but script runs under 1 minute ;)
 for tag in all_10_tags:
     with open(output, 'a') as file_object:
         file_object.write(print_tag_header(tag))
@@ -125,7 +109,7 @@ for tag in all_10_tags:
             with open(output, 'a') as file_object:
                 file_object.write(print_book_tag(book))
     with open(output, 'a') as file_object:
-        file_object.write(f"</ul>\n")
+        file_object.write("</ul>\n")
 
 
 # level BF: overview of all tags
@@ -147,7 +131,7 @@ for tag in all_BF_tags:
             with open(output, 'a') as file_object:
                 file_object.write(print_book_tag(book))
     with open(output, 'a') as file_object:
-        file_object.write(f"</ul>\n")
+        file_object.write("</ul>\n")
 
 
 # level LF: overview of all tags
@@ -169,4 +153,4 @@ for tag in all_LF_tags:
             with open(output, 'a') as file_object:
                 file_object.write(print_book_tag(book))
     with open(output, 'a') as file_object:
-        file_object.write(f"</ul>\n")
+        file_object.write("</ul>\n")
